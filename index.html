@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tính Điểm IT</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="it-panel">
+      <div class="panel-header">
+        <div class="panel-title">Tính Điểm IT</div>
+      </div>
+
+      <div class="panel-body">
+        <div class="add-section">
+          <div class="input-group">
+            <div class="flex-row">
+              <select id="subject-select">
+                <option value="Python">Python</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="C++">C++</option>
+                <option value="Java">Java</option>
+                <option value="SQL">SQL</option>
+                <option value="custom">-- Nhập tên môn khác --</option>
+              </select>
+              <button id="add-subject-btn" class="btn btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </button>
+            </div>
+            <input
+              type="text"
+              id="custom-subject"
+              class="hidden"
+              placeholder="Nhập tên môn học..."
+            />
+          </div>
+        </div>
+
+        <div id="subjects-container" class="subjects-list">
+          <!-- Dynamic subject cards will be added here -->
+        </div>
+      </div>
+
+      <div class="footer">
+        <button id="export-btn" class="btn btn-primary">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Xuất Excel(.xls)
+        </button>
+      </div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
