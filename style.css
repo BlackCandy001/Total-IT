@@ -184,6 +184,28 @@ input:checked + .slider:before {
   border: none;
 }
 
+.header-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.subject-count-info {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+#total-subjects-count {
+  color: var(--primary);
+  font-weight: 700;
+}
+
 .bulk-scan-section {
   padding: 0 16px 12px;
   border-bottom: 1px solid var(--border);

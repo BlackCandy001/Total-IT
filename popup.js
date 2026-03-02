@@ -145,6 +145,12 @@ document.addEventListener("DOMContentLoaded", () => {
     subjectsContainer.innerHTML = "";
     const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
     
+    // Update total count display
+    const totalCountDisplay = document.getElementById("total-subjects-count");
+    if (totalCountDisplay) {
+      totalCountDisplay.innerText = subjects.length;
+    }
+
     subjects.forEach(subject => {
       if (!searchTerm || subject.name.toLowerCase().includes(searchTerm)) {
         renderSubject(subject);
