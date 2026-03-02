@@ -3,9 +3,8 @@
   "name": "Tính Điểm",
   "version": "1.0",
   "description": "Tiện ích tính điểm đạt/không đạt cho sinh viên IT.",
-  "permissions": [],
+  "permissions": ["sidePanel"],
   "action": {
-    "default_popup": "index.html",
     "default_title": "Tính Điểm IT",
     "default_icon": {
       "16": "icon-16.png",
@@ -21,6 +20,12 @@
   "sidebar_action": {
     "default_panel": "index.html",
     "default_title": "Tính Điểm IT"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "index.html"
   },
   "browser_specific_settings": {
     "gecko": {

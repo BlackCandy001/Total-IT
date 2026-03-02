@@ -3,9 +3,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const customSubjectInput = document.getElementById("custom-subject");
   const addSubjectBtn = document.getElementById("add-subject-btn");
   const subjectsContainer = document.getElementById("subjects-container");
+  const searchInput = document.getElementById("search-subject");
   const exportBtn = document.getElementById("export-btn");
+  const backToTopBtn = document.getElementById("back-to-top-btn");
+  const panelBody = document.querySelector(".panel-body");
 
-  const PASS_THRESHOLD = 4.5;
+  const PASS_THRESHOLD = 40;
   let subjects = [];
 
   // Handle custom subject visibility
@@ -16,6 +19,23 @@ document.addEventListener("DOMContentLoaded", () => {
       customSubjectInput.classList.add("hidden");
     }
   });
+
+  // Search functionality
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const cards = subjectsContainer.querySelectorAll(".subject-card");
+      
+      cards.forEach(card => {
+        const subjectName = card.querySelector(".subject-name").textContent.toLowerCase();
+        if (subjectName.includes(searchTerm)) {
+          card.style.display = "flex";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    });
+  }
 
   // Add subject functionality
   addSubjectBtn.addEventListener("click", () => {
@@ -76,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 data-index="${num - 1}"
                 placeholder="Điểm ${num}"
                 min="0"
-                max="10"
+                max="100"
                 step="0.1"
               />
             </div>
@@ -256,5 +276,22 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     }, 0);
+  });
+
+  // Show/hide back to top button
+  panelBody.addEventListener("scroll", () => {
+    if (panelBody.scrollTop > 50) {
+      backToTopBtn.classList.add("visible");
+    } else {
+      backToTopBtn.classList.remove("visible");
+    }
+  });
+
+  // Scroll to top
+  backToTopBtn.addEventListener("click", () => {
+    panelBody.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   });
 });
