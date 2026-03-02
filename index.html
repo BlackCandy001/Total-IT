@@ -9,7 +9,16 @@
   <body>
     <div id="it-panel">
       <div class="panel-header">
-        <div class="panel-title">Tính Điểm IT</div>
+        <div class="header-top">
+          <div class="panel-title">Tính Điểm IT</div>
+          <div class="auto-sync-wrapper">
+            <span class="auto-sync-label">Auto Gmail</span>
+            <label class="switch">
+              <input type="checkbox" id="auto-sync-toggle" checked>
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
         <div class="search-box">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
@@ -19,7 +28,31 @@
         </div>
       </div>
 
-      <div class="panel-body">
+        <div class="bulk-scan-section">
+          <div class="bulk-scan-actions">
+            <button id="bulk-scan-btn" class="btn btn-bulk" title="Quét tất cả email điểm đang hiển thị">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              Quét toàn bộ trang Gmail
+            </button>
+            <button id="stop-scan-btn" class="btn btn-stop hidden" title="Dừng quét">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              </svg>
+              Dừng quét
+            </button>
+          </div>
+          <div id="scan-progress-container" class="progress-container hidden">
+            <div class="progress-text">Đang quét: <span id="scan-count">0</span> email...</div>
+            <div class="progress-bar">
+              <div id="scan-progress-fill" class="progress-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body">
         <div class="add-section">
           <div class="input-group">
             <div class="flex-row">
@@ -68,23 +101,34 @@
       </button>
 
       <div class="footer">
-        <button id="export-btn" class="btn btn-primary">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          Xuất Excel(.xls)
-        </button>
+        <div class="footer-actions">
+          <button id="clear-all-btn" class="btn btn-outline-danger" title="Xóa tất cả dữ liệu">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+            Xóa hết
+          </button>
+          <button id="export-btn" class="btn btn-primary">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Xuất Excel
+          </button>
+        </div>
       </div>
     </div>
     <script src="popup.js"></script>

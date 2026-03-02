@@ -3,7 +3,8 @@
   "name": "Tính Điểm",
   "version": "1.0",
   "description": "Tiện ích tính điểm đạt/không đạt cho sinh viên IT.",
-  "permissions": ["sidePanel"],
+  "permissions": ["sidePanel", "storage", "activeTab"],
+  "host_permissions": ["*://mail.google.com/*"],
   "action": {
     "default_title": "Tính Điểm IT",
     "default_icon": {
@@ -12,6 +13,13 @@
       "128": "icon-128.png"
     }
   },
+  "content_scripts": [
+    {
+      "matches": ["*://mail.google.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "icons": {
     "16": "icon-16.png",
     "48": "icon-48.png",
@@ -22,6 +30,7 @@
     "default_title": "Tính Điểm IT"
   },
   "background": {
+    "service_worker": "background.js",
     "scripts": ["background.js"]
   },
   "side_panel": {
@@ -31,5 +40,11 @@
     "gecko": {
       "id": "tinh-diem-it@blackcandy001"
     }
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["inject.js"],
+      "matches": ["*://mail.google.com/*"]
+    }
+  ]
 }
