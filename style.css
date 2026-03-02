@@ -173,6 +173,11 @@ input[type=number] {
   width: 100%;
 }
 
+.flex-row select,
+.flex-row input {
+  flex: 1;
+}
+
 .subjects-list {
   display: flex;
   flex-direction: column;
@@ -287,6 +292,18 @@ input[type=number] {
 
 .btn-primary:hover {
   background-color: var(--button-bg-hover);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: var(--button-second-bg);
+  color: var(--text-primary);
+  width: auto;
+  padding: 10px 14px;
+}
+
+.btn-secondary:hover {
+  background-color: var(--button-second-bg-hover);
   transform: translateY(-1px);
 }
 

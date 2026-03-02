@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const subjectSelect = document.getElementById("subject-select");
   const customSubjectInput = document.getElementById("custom-subject");
   const addSubjectBtn = document.getElementById("add-subject-btn");
+  const sortSubjectBtn = document.getElementById("sort-subject-btn");
   const subjectsContainer = document.getElementById("subjects-container");
   const searchInput = document.getElementById("search-subject");
   const exportBtn = document.getElementById("export-btn");
@@ -32,6 +33,26 @@ document.addEventListener("DOMContentLoaded", () => {
           card.style.display = "flex";
         } else {
           card.style.display = "none";
+        }
+      });
+    });
+  }
+
+  // Sort functionality (group similar names)
+  if (sortSubjectBtn) {
+    sortSubjectBtn.addEventListener("click", () => {
+      if (subjects.length === 0) {
+        alert("Chưa có môn học nào để sắp xếp!");
+        return;
+      }
+      // Sort the array by name alphabetically (groups similar names together)
+      subjects.sort((a, b) => a.name.localeCompare(b.name, 'vi', { numeric: true, sensitivity: 'base' }));
+      
+      // Update DOM by re-appending children in sorted order
+      subjects.forEach(subject => {
+        const card = subjectsContainer.querySelector(`.subject-card[data-id="${subject.id}"]`);
+        if (card) {
+          subjectsContainer.appendChild(card);
         }
       });
     });

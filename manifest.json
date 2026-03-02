@@ -22,7 +22,7 @@
     "default_title": "Tính Điểm IT"
   },
   "background": {
-    "service_worker": "background.js"
+    "scripts": ["background.js"]
   },
   "side_panel": {
     "default_path": "index.html"
