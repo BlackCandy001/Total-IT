@@ -53,3 +53,7 @@ Tiện ích mở rộng trình duyệt giúp sinh viên quản lý và tính đi
 ## 📄 Bản quyền
 
 Dự án được phát triển nhằm hỗ trợ sinh viên IT trong việc quản lý học tập.
+
+---
+
+**Tác giả:** Black Candy 🍫
