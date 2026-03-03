@@ -45,10 +45,33 @@ Tiện ích mở rộng trình duyệt giúp sinh viên quản lý và tính đi
 
 ## 📝 Hướng dẫn sử dụng
 
-1. Mở tiện ích từ thanh công cụ hoặc thanh bên.
-2. Chọn tên môn học từ danh sách, nhập tên môn tùy chỉnh, hoặc sử dụng thanh tìm kiếm để lọc môn học.
-3. Nhập điểm vào các ô (1, 2, 3) theo thang điểm 100. Các chấm màu sẽ thay đổi dựa trên điểm số (>= 40 là Đạt).
-4. Nhấn **Xuất Excel** để tải về báo cáo định dạng chuyên nghiệp.
+Tiện ích hỗ trợ 3 cách lấy và quản lý điểm số:
+
+### 1. Nhập thủ công
+
+- Mở tiện ích từ thanh công cụ hoặc thanh bên.
+- Chọn tên môn học từ danh sách có sẵn hoặc chọn **"Khác..."** để tự nhập tên môn mới.
+- Nhập điểm vào các ô tương ứng với từng lần thi (Lần 1, 2, 3). Các chấm màu sẽ thay đổi tự động (>= 40 là **Đạt**).
+
+### 2. Tự động lấy điểm từ Gmail (Từng email)
+
+- Khi bạn mở một email có tiêu đề như _"Kết quả thi môn..."_, extension sẽ tự động quét nội dung và lưu điểm vào danh sách.
+- Một thông báo (Toast) màu xanh sẽ hiển thị ở góc màn hình khi dữ liệu được lưu thành công.
+
+### 3. Quét hàng loạt (Bulk Scan)
+
+- Truy cập vào danh sách email trên [Gmail](https://mail.google.com).
+- Mở menu extension và nhấn nút **"Quét nhanh Gmail"**.
+- Extension sẽ quét tất cả các email có tiêu đề liên quan đến kết quả thi đang hiển thị trên trang hiện tại và tự động cập nhật điểm số cho tất cả các môn đó.
+- _Lưu ý:_ Nếu gặp thông báo lỗi "Không tìm thấy mã ik", hãy thử mở một email điểm bất kỳ, đợi 1 giây rồi quay lại danh sách email để thử lại. Hoặc loand lại toàn hộ trang email rồi thử lại.
+
+* Extension chỉ quét được những email mà trang đó đang hiển thị! Nếu các email điểm số nằm ở các trang khác nhau thì có thể next resoults qua trang tiếp theo rồi quét tiếp.
+
+### 4. Quản lý và Xuất báo cáo
+
+- Sử dụng thanh tìm kiếm để lọc nhanh danh sách môn học.
+- Nhấn nút **"Dọn dẹp"** để xóa toàn bộ dữ liệu nếu cần.
+- Nhấn **"Xuất Excel"** để tải về báo cáo định dạng chuyên nghiệp, bao gồm bảng tổng hợp các môn chưa đạt để tiện theo dõi.
 
 ## 📄 Bản quyền
 
