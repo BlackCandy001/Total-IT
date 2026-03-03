@@ -30,6 +30,10 @@ Tiện ích mở rộng trình duyệt giúp sinh viên quản lý và tính đi
 
 ## 🚀 Hướng dẫn cài đặt
 
+Tải dự án này về: Git clone https://github.com/BlackCandy001/Total-IT.git
+
+Hoặc dowloand zip về r giải nén.
+
 ### Trên Firefox
 
 1. Truy cập `about:debugging#/runtime/this-firefox`.
