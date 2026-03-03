@@ -1,3 +1,4 @@
+/* Biến màu sắc và cấu hình giao diện */
 :root {
   --primary: #3686ff;
   --background: #0a0a0a;
@@ -73,7 +74,7 @@ body {
   color: var(--text-secondary);
 }
 
-/* Switch Styles */
+/* Kiểu dáng cho nút gạt (Switch) */
 .switch {
   position: relative;
   display: inline-block;
@@ -591,7 +592,7 @@ input[type=number] {
   transform: translateY(-2px);
 }
 
-/* Scrollbar */
+/* Kiểu dáng thanh cuộn (Scrollbar) */
 .panel-body::-webkit-scrollbar {
   width: 6px;
 }

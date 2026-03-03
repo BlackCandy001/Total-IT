@@ -19,25 +19,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const PASS_THRESHOLD = 40;
   let subjects = [];
 
-  // Handle Clear All
+  // Xử lý Xóa tất cả
   clearAllBtn.addEventListener("click", () => {
     if (confirm("Bạn có chắc chắn muốn xóa TẤT CẢ môn học và điểm không? Hành động này không thể hoàn tác.")) {
       chrome.storage.local.set({ subjects: [] }, () => {
         subjects = [];
         subjectsContainer.innerHTML = "";
-        console.log("Tính Điểm IT: All subjects cleared.");
+        console.log("Tính Điểm IT: Đã xóa tất cả môn học.");
       });
     }
   });
 
-  // Handle Bulk Scan
+  // Xử lý Quét hàng loạt
   bulkScanBtn.addEventListener("click", async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     
     if (!tab) return;
     
     const isGmail = tab.url && tab.url.includes("mail.google.com");
-    console.log("Tính Điểm IT: Active tab URL:", tab.url);
+    console.log("Tính Điểm IT: URL tab đang hoạt động:", tab.url);
 
     if (!isGmail) {
       alert("Vui lòng mở Gmail để thực hiện quét toàn bộ!");
@@ -62,11 +62,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     chrome.tabs.sendMessage(tab.id, { action: "START_BULK_SCAN" });
 
-    // Store original content to restore later
+    // Lưu nội dung gốc để khôi phục sau này
     bulkScanBtn.dataset.originalContent = originalContent;
   });
 
-  // Handle Stop Scan
+  // Xử lý Dừng quét
   if (stopScanBtn) {
     stopScanBtn.addEventListener("click", async () => {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Listen for scan progress from content.js
+  // Lắng nghe tiến trình quét từ content.js
   chrome.runtime.onMessage.addListener((message) => {
     if (message.action === "SCAN_PROGRESS") {
       if (message.total === 0) {
@@ -108,9 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (stopScanBtn) stopScanBtn.classList.add("hidden");
   }
 
-  // Load sync toggle state
+  // Tải trạng thái nút gạt đồng bộ
   chrome.storage.local.get(['autoSyncEnabled'], (result) => {
-    // Default to true if not set
+    // Mặc định là true nếu chưa được thiết lập
     const enabled = result.autoSyncEnabled !== false;
     autoSyncToggle.checked = enabled;
   });
@@ -119,10 +119,10 @@ document.addEventListener("DOMContentLoaded", () => {
     chrome.storage.local.set({ autoSyncEnabled: autoSyncToggle.checked });
   });
 
-  // Load data on start
+  // Tải dữ liệu khi bắt đầu
   loadFromStorage();
 
-  // Listen for storage changes (for sync from content.js)
+  // Lắng nghe thay đổi bộ nhớ (để đồng bộ từ content.js)
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === 'local' && changes.subjects) {
       subjects = changes.subjects.newValue || [];
@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
     subjectsContainer.innerHTML = "";
     const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
     
-    // Update total count display
+    // Cập nhật tổng số lượng hiển thị
     const totalCountDisplay = document.getElementById("total-subjects-count");
     if (totalCountDisplay) {
       totalCountDisplay.innerText = subjects.length;
@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Handle custom subject visibility
+  // Xử lý hiển thị môn học tùy chỉnh
   subjectSelect.addEventListener("change", () => {
     if (subjectSelect.value === "custom") {
       customSubjectInput.classList.remove("hidden");
@@ -167,14 +167,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Search functionality
+  // Tính năng tìm kiếm
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
       renderAllSubjects();
     });
   }
 
-  // Sort functionality (group similar names)
+  // Tính năng sắp xếp (nhóm các tên tương tự)
   if (sortSubjectBtn) {
     sortSubjectBtn.addEventListener("click", () => {
       if (subjects.length === 0) {
@@ -182,12 +182,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       subjects.sort((a, b) => a.name.localeCompare(b.name, 'vi', { numeric: true, sensitivity: 'base' }));
-      saveToStorage(); // Persist the new order
+      saveToStorage(); // Lưu lại thứ tự mới
       renderAllSubjects();
     });
   }
 
-  // Add subject functionality
+  // Tính năng thêm môn học
   addSubjectBtn.addEventListener("click", () => {
     const subjectName =
       subjectSelect.value === "custom"
@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     addSubject(subjectName);
     
-    // Reset inputs
+    // Đặt lại các đầu vào
     if (subjectSelect.value === "custom") {
       customSubjectInput.value = "";
     }
@@ -275,7 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
-    // Handle removal
+    // Xử lý việc xóa
     card.querySelector(".remove-btn").addEventListener("click", () => {
       subjects = subjects.filter((s) => s.id !== subject.id);
       saveToStorage();
@@ -284,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const statusDot = card.querySelector(".status-dot");
 
-    // Handle grade changes
+    // Xử lý thay đổi điểm số
     const inputs = card.querySelectorAll(".grade-input");
     inputs.forEach((input) => {
       input.addEventListener("input", (e) => {
@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         saveToStorage();
 
-        // Update overall status
+        // Cập nhật trạng thái tổng quát
         statusDot.className = `status-dot ${getOverallStatus(subject)}`;
       });
     });
@@ -323,7 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return lastGrade >= PASS_THRESHOLD ? "pass" : "fail";
   }
 
-  // Export functionality (Beautiful HTML-based Excel)
+  // Tính năng Xuất dữ liệu (Excel đẹp dựa trên HTML)
   exportBtn.addEventListener("click", () => {
     if (subjects.length === 0) {
       alert("Chưa có dữ liệu để xuất!");
@@ -491,7 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 0);
   });
 
-  // Show/hide back to top button
+  // Hiển thị/ẩn nút quay lại đầu trang
   panelBody.addEventListener("scroll", () => {
     if (panelBody.scrollTop > 50) {
       backToTopBtn.classList.add("visible");
@@ -500,7 +500,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Scroll to top
+  // Cuộn lên đầu trang
   backToTopBtn.addEventListener("click", () => {
     panelBody.scrollTo({
       top: 0,

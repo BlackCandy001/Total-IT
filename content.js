@@ -1,10 +1,10 @@
 /**
- * Content script to automatically scrape exam results from Gmail for CTU students.
+ * Content script để tự động thu thập kết quả thi từ Gmail cho sinh viên.
  */
 
 console.log("Tính Điểm IT: Content script loaded on Gmail.");
 
-// Inject a small script to extract 'ik' from the page context (isolated world can't see GLOBALS)
+// Chèn một script nhỏ để trích xuất mã 'ik' từ ngữ cảnh trang (thế giới bị cô lập không thể thấy GLOBALS)
 function injectIkExtractor() {
   const script = document.createElement('script');
   script.src = chrome.runtime.getURL('inject.js');
@@ -16,7 +16,7 @@ function injectIkExtractor() {
 
 injectIkExtractor();
 
-// Function to find and scrape exam data from the email body
+// Hàm tìm và thu thập dữ liệu thi từ nội dung email
 function scrapeExamData() {
   const emailBodies = document.querySelectorAll('div[role="main"] .adn.ads, .ii.gt, .a3s.aiL');
   
@@ -27,7 +27,7 @@ function scrapeExamData() {
     body.dataset.processed = "true";
     setTimeout(() => body.dataset.processed = "false", 5000);
 
-    // 1. Try Table Scraper
+    // 1. Thử thu thập từ bảng (Table Scraper)
     const tables = body.querySelectorAll('table');
     let foundInTable = false;
     tables.forEach(table => {
@@ -41,7 +41,7 @@ function scrapeExamData() {
       }
     });
 
-    // 2. Try List/Text Scraper (if no table found or as fallback)
+    // 2. Thử thu thập từ danh sách/văn bản (nếu không tìm thấy bảng hoặc dùng làm phương án dự phòng)
     if (!foundInTable) {
       scrapeFromText(body);
     }
@@ -54,7 +54,7 @@ function processExamTable(table) {
   let headerRowIndex = -1;
   let headers = [];
 
-  // Find the header row by looking for keywords
+  // Tìm hàng tiêu đề bằng cách tìm từ khóa
   for (let i = 0; i < rows.length; i++) {
     const cells = Array.from(rows[i].querySelectorAll('td, th')).map(c => c.innerText.trim().toLowerCase());
     if (cells.some(t => t.includes("môn") || t.includes("học phần"))) {
@@ -76,7 +76,7 @@ function processExamTable(table) {
       if (headers[index]) entry[headers[index]] = text;
     });
 
-    // Flexible mapping
+    // Ánh xạ linh hoạt các cột dữ liệu
     const rawName = entry["môn thi"] || entry["tên môn"] || entry["tên học phần"] || entry["môn học"] || entry["môn"];
     const type = entry["loại thi"] || entry["loại"] || "";
     const attemptStr = entry["lần thi"] || entry["lần"] || "1";
@@ -100,7 +100,7 @@ function processExamTable(table) {
   }
 
   if (dataFound.length > 0) {
-    console.log("Tính Điểm IT: Scraped data from table:", dataFound);
+    console.log("Tính Điểm IT: Dữ liệu đã thu thập từ bảng:", dataFound);
     saveToStorage(dataFound);
   }
 }
@@ -149,28 +149,27 @@ function showToast(message) {
 
 let isScanning = false;
 
-// Listen for commands from Popup
+// Lắng nghe lệnh từ Popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "START_BULK_SCAN") {
     startBulkScan();
   } else if (request.action === "STOP_SCAN") {
     isScanning = false;
-    console.log("Tính Điểm IT: Stop signal received.");
+    console.log("Tính Điểm IT: Đã nhận tín hiệu dừng quét.");
   }
 });
 
-// Placeholder for resetScanButton - assuming it's defined in popup.js or similar
+// Hàm đặt lại nút quét - giả định nó được định nghĩa trong popup.js hoặc tương tự
 function resetScanButton() {
-  // This function would typically send a message back to the popup to reset its UI.
-  // For content script, we just log it.
-  console.log("Tính Điểm IT: Resetting scan button (UI update requested).");
+  // Hàm này thường gửi thông báo về popup để đặt lại giao diện người dùng.
+  console.log("Tính Điểm IT: Đang đặt lại nút quét (yêu cầu cập nhật giao diện).");
   chrome.runtime.sendMessage({ action: "RESET_SCAN_BUTTON" });
 }
 
 async function startBulkScan() {
-  if (isScanning) return; // Prevent multiple scans
+  if (isScanning) return; // Ngăn chặn việc quét nhiều lần
   isScanning = true;
-  console.log("Tính Điểm IT: Starting Bulk Scan procedure...");
+  console.log("Tính Điểm IT: Bắt đầu quy trình quét hàng loạt...");
   
   const ik = getIk();
   if (!ik) {
@@ -181,7 +180,7 @@ async function startBulkScan() {
     return;
   }
 
-  // Improved row selection - targeting Gmail's email rows more accurately
+  // Cải thiện việc chọn hàng - nhắm mục tiêu chính xác hơn vào các hàng email của Gmail
   const emailRows = Array.from(document.querySelectorAll('tr.zA, tr[role="row"], .zA'));
   
   const examEmails = emailRows.filter(row => {
@@ -198,14 +197,14 @@ async function startBulkScan() {
   }
 
   const total = examEmails.length;
-  console.log(`Tính Điểm IT: Found ${total} target emails. Starting loop...`);
+  console.log(`Tính Điểm IT: Tìm thấy ${total} email mục tiêu. Bắt đầu vòng lặp...`);
   let processedCount = 0;
   let successCount = 0;
 
   for (const row of examEmails) {
     let threadId = null;
 
-    // Discovery Step 1: Standard and Modern Attributes
+    // Bước khám phá 1: Các thuộc tính tiêu chuẩn và hiện đại
     const idAttrs = ['data-id', 'data-thread-id', 'data-legacy-thread-id', 'id'];
     for (const attr of idAttrs) {
         const val = row.getAttribute(attr);
@@ -215,7 +214,7 @@ async function startBulkScan() {
         }
     }
 
-    // Discovery Step 2: Check standard Gmail children (Checkbox, Star)
+    // Bước khám phá 2: Kiểm tra các thành phần con tiêu chuẩn của Gmail (Checkbox, Star)
     if (!threadId) {
         const children = row.querySelectorAll('div[role="checkbox"], div[role="button"], span[data-thread-id]');
         for (const child of children) {
@@ -230,12 +229,12 @@ async function startBulkScan() {
         }
     }
 
-    // Discovery Step 3: Check all links
+    // Bước khám phá 3: Kiểm tra tất cả các liên kết
     if (!threadId) {
         const links = row.querySelectorAll('a');
         for (const link of links) {
             const href = link.href || "";
-            // Look for 16-char hex in URL
+            // Tìm mã hex 16 ký tự trong URL
             const matches = href.match(/[a-f0-9]{16}/);
             if (matches) {
                 threadId = matches[0];
@@ -244,7 +243,7 @@ async function startBulkScan() {
         }
     }
 
-    // Discovery Step 4: RegEx Fallback on OuterHTML
+    // Bước khám phá 4: Sử dụng RegEx dự phòng trên OuterHTML
     if (!threadId) {
         const matches = row.outerHTML.match(/"([a-f0-9]{16})"/);
         if (matches) {
@@ -252,7 +251,7 @@ async function startBulkScan() {
         }
     }
     
-    // Validate final ID
+    // Xác thực ID cuối cùng
     const isValidId = threadId && /^[a-f0-9]{16}$/.test(threadId);
     
     if (isValidId) {
@@ -260,11 +259,11 @@ async function startBulkScan() {
         const baseUrl = window.location.origin + window.location.pathname;
         const printUrl = `${baseUrl}?ui=2&ik=${ik}&view=pt&search=all&th=${threadId}`;
         
-        console.log(`Tính Điểm IT: Processing [${processedCount + 1}/${total}] - ID: ${threadId}`);
+        console.log(`Tính Điểm IT: Đang xử lý [${processedCount + 1}/${total}] - ID: ${threadId}`);
         
-        // Add timeout to fetch to prevent hanging for minutes
+        // Thêm thời gian chờ cho fetch để tránh bị treo trong vài phút
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // Thời gian chờ 8 giây
 
         const response = await fetch(printUrl, { signal: controller.signal });
         clearTimeout(timeoutId);
@@ -275,65 +274,65 @@ async function startBulkScan() {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
         
-        console.log(`Tính Điểm IT: Fetched HTML length for ${threadId}: ${html.length}`);
+        console.log(`Tính Điểm IT: Đã lấy độ dài HTML cho ${threadId}: ${html.length}`);
         
         const found = scrapeFromText(doc.body, true);
         if (found) {
             successCount++;
         } else {
-            console.log(`Tính Điểm IT: Extraction failed for ${threadId}. Text content sample:`, doc.body.innerText.substring(0, 300));
-            // Log full HTML to console for one failure to inspect structure
+            console.log(`Tính Điểm IT: Trích xuất không thành công cho ${threadId}. Mẫu nội dung văn bản:`, doc.body.innerText.substring(0, 300));
+            // Ghi lại toàn bộ HTML vào console cho một lần thất bại để kiểm tra cấu trúc
             if (successCount === 0 && processedCount === 0) {
-               console.log("Tính Điểm IT: Full HTML structure for debugging:", html);
+               console.log("Tính Điểm IT: Cấu trúc HTML đầy đủ để gỡ lỗi:", html);
             }
         }
 
       } catch (error) {
-        console.error(`Tính Điểm IT: Skipping entry ${threadId} due to error:`, error.message);
+        console.error(`Tính Điểm IT: Bỏ qua mục ${threadId} do lỗi:`, error.message);
       }
     } else {
-      console.warn("Tính Điểm IT: Skipping row - no 16-char thread ID found. Row HTML sample:", row.outerHTML.substring(0, 500));
+      console.warn("Tính Điểm IT: Bỏ qua hàng - không tìm thấy mã thread ID 16 ký tự. Mẫu HTML hàng:", row.outerHTML.substring(0, 500));
     }
     
     processedCount++;
     chrome.runtime.sendMessage({ action: "SCAN_PROGRESS", current: processedCount, total: total });
     
-    // Check if scan should stop
+    // Kiểm tra xem có nên dừng quét không
     if (!isScanning) {
-        console.log("Tính Điểm IT: Stopping scan loop as requested.");
+        console.log("Tính Điểm IT: Đang dừng vòng lặp quét theo yêu cầu.");
         break;
     }
 
-    // Smooth delay between requests
+    // Độ trễ mượt mà giữa các yêu cầu
     await new Promise(r => setTimeout(r, 800));
   }
   
   isScanning = false;
-  console.log(`Tính Điểm IT: Bulk scan finished. Total: ${processedCount}, Success: ${successCount}`);
+  console.log(`Tính Điểm IT: Hoàn tất quét hàng loạt. Tổng cộng: ${processedCount}, Thành công: ${successCount}`);
   alert(`Quét hoàn tất!\n\nĐã xử lý: ${processedCount} email.\nĐã lưu điểm: ${successCount} môn học.`);
 }
 
 function getIk() {
-  // Method 1: Data attribute from injected script (Primary)
+  // Phương pháp 1: Thuộc tính dữ liệu từ script đã chèn (Chính)
   let ik = document.body.getAttribute('data-ik');
   if (ik) return ik;
 
-  // Method 2: URL Parameters
+  // Phương pháp 2: Tham số URL
   const urlParams = new URLSearchParams(window.location.search);
   ik = urlParams.get('ik');
   if (ik) return ik;
 
-  // Method 3: Search in all script tags
+  // Phương pháp 3: Tìm kiếm trong tất cả các thẻ script
   const scripts = document.querySelectorAll('script');
   for (const script of scripts) {
     const content = script.textContent;
     if (!content) continue;
     
-    // Pattern 1: Look for var GLOBALS=[..., "cf60d70744", ...] (usually index 9)
+    // Mẫu 1: Tìm var GLOBALS=[..., "cf60d70744", ...] (thường ở chỉ số 9)
     if (content.includes("GLOBALS")) {
       const gMatch = content.match(/var\s+GLOBALS\s*=\s*\[([^\]]+)\]/);
       if (gMatch) {
-         const parts = gMatch[1].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); // Split by comma outside quotes
+         const parts = gMatch[1].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); // Tách bằng dấu phẩy bên ngoài dấu ngoặc kép
          if (parts.length > 9) {
            const val = parts[9].trim().replace(/^["']|["']$/g, '');
            if (val && /^[a-f0-9]{10}$/.test(val)) return val;
@@ -341,13 +340,13 @@ function getIk() {
       }
     }
 
-    // Pattern 2: Look for _GM_setData used in modern "pinto" views
+    // Mẫu 2: Tìm _GM_setData được sử dụng trong các chế độ xem "pinto" hiện đại
     if (content.includes("_GM_setData")) {
       const sdMatch = content.match(/"w43KIf"\s*:\s*\[\s*"[^"]+"\s*,\s*"[^"]+"\s*,\s*"([^"]+)"/);
       if (sdMatch) return sdMatch[1];
     }
     
-    // Pattern 3: Standard ik key-value
+    // Mẫu 3: Cặp khóa-giá trị ik tiêu chuẩn
     const match = content.match(/"ik"\s*[:]\s*"([^"]+)"/) || 
                   content.match(/'ik'\s*[:]\s*'([^']+)'/) ||
                   content.match(/["']ik["']\s*,\s*["']([^"']+)["']/) ||
@@ -356,7 +355,7 @@ function getIk() {
     if (match && match[1] && match[1].length >= 5) return match[1];
   }
 
-  // Method 4: Search in all links on the page (Fallback)
+  // Phương pháp 4: Tìm kiếm trong tất cả các liên kết trên trang (Dự phòng)
   const links = document.querySelectorAll('a[href*="ik="]');
   for (const link of links) {
     const match = link.href.match(/ik=([^&]+)/);
@@ -369,7 +368,7 @@ function getIk() {
 function scrapeFromText(element, isBulk = false) {
   const text = element.innerText || "";
   
-  // 1. Try Table Parsing (Often more reliable for CTU/University emails)
+  // 1. Thử phân tích bảng (Thường đáng tin cậy hơn cho các email đại học)
   const tables = element.querySelectorAll('table');
   for (const table of tables) {
     const rows = table.querySelectorAll('tr');
@@ -383,11 +382,11 @@ function scrapeFromText(element, isBulk = false) {
       }
     });
 
-    // Check if this table looks like a result table
+    // Kiểm tra xem bảng này có giống bảng kết quả không
     const nameKey = Object.keys(tableData).find(k => /Môn|Học phần|Tên/i.test(k));
     const scoreKey = Object.keys(tableData).find(k => /Điểm|Kết quả/i.test(k));
     
-    // Helper to clean table values that might have swallowed entire lines
+    // Trình hỗ trợ để làm sạch giá trị bảng có thể chứa toàn bộ dòng
     const cleanTableValue = (val, pattern) => {
       const match = val.match(pattern);
       return match ? match[1].trim() : val.trim();
@@ -400,7 +399,7 @@ function scrapeFromText(element, isBulk = false) {
 
       if (isAbsent || isBanned) {
         let subjectName = tableData[nameKey];
-        // Clean if it contains headers (happens in layout tables)
+        // Làm sạch nếu nó chứa các tiêu đề (thường xảy ra trong các bảng bố cục)
         const nameCleanPattern = /(?:Môn thi|Tên môn|Học phần|Môn học|Môn|Tên học phần)\s*[:\-]\s*(.+?)(?=\s*(?:Loại|Lần|Ngày|Điểm|Kết|;|[\n\r\t]|$))/i;
         if (subjectName.includes(":") || subjectName.length > 100) {
           const m = subjectName.match(nameCleanPattern);
@@ -427,7 +426,7 @@ function scrapeFromText(element, isBulk = false) {
         }
         
         const statusText = isAbsent ? "Vắng" : "Cấm";
-        console.log(`Tính Điểm IT: Table Match (${statusText})! ${finalName}`);
+        console.log(`Tính Điểm IT: Khớp bảng (${statusText})! ${finalName}`);
         saveToStorage([{ name: finalName, score: statusText, attempt: attempt }], isBulk);
         return true;
       }
@@ -462,7 +461,7 @@ function scrapeFromText(element, isBulk = false) {
            attempt = attemptMatch ? parseInt(attemptMatch[1]) : 1;
         }
 
-        console.log(`Tính Điểm IT: Table Match! ${finalName}: ${score}`);
+        console.log(`Tính Điểm IT: Khớp bảng! ${finalName}: ${score}`);
         saveToStorage([{ name: finalName, score: score, attempt: attempt }], isBulk);
         return true;
       }
@@ -470,10 +469,10 @@ function scrapeFromText(element, isBulk = false) {
   }
 
   if (isBulk && text.length < 50) {
-    console.log("Tính Điểm IT: Text too short or empty in bulk scan:", text);
+    console.log("Tính Điểm IT: Văn bản quá ngắn hoặc trống khi quét hàng loạt:", text);
   }
   
-  // 2. Fallback to Regex Patterns (Optimized for CUSC)
+  // 2. Dự phòng bằng các mẫu Regex
   const patterns = {
     name: /(?:Môn thi|Tên môn|Học phần|Môn học|Môn|Tên học phần)\s*[:\-]\s*(.+?)(?=\s*(?:Loại|Lần|Ngày|Điểm|Kết|;|[\n\r\t]|$))/i,
     score: /(?:Điểm thi|Điểm kết thúc|Kết quả|Điểm|Kết quả thi)\s*[:\-]\s*([\d,.]+|vắng\s*thi|cấm\s*thi)/i,
@@ -484,7 +483,7 @@ function scrapeFromText(element, isBulk = false) {
   const nameMatch = text.match(patterns.name);
   let scoreMatch = text.match(patterns.score);
   
-  // Robust fallback for 'vắng thi' or 'cấm thi' if specific labels didn't match
+  // Dự phòng mạnh mẽ cho 'vắng thi' hoặc 'cấm thi' nếu các nhãn cụ thể không khớp
   if (!scoreMatch) {
       const vMatch = text.match(/vắng\s*thi/i);
       const cMatch = text.match(/cấm\s*thi/i);
@@ -505,7 +504,7 @@ function scrapeFromText(element, isBulk = false) {
       const scoreStr = scoreRaw.replace(',', '.');
       score = parseFloat(scoreStr);
       if (isNaN(score)) {
-        console.warn("Tính Điểm IT: Score is NaN for", subjectName, scoreRaw);
+        console.warn("Tính Điểm IT: Điểm bị lỗi NaN cho", subjectName, scoreRaw);
         return false;
       }
     }
@@ -519,12 +518,12 @@ function scrapeFromText(element, isBulk = false) {
     const finalName = type ? `${subjectName} (${type})` : subjectName;
     const data = [{ name: finalName, score: score, attempt: attempt }];
 
-    console.log(`Tính Điểm IT: Regex Match! ${finalName}: ${score}`);
+    console.log(`Tính Điểm IT: Khớp Regex! ${finalName}: ${score}`);
     saveToStorage(data, isBulk);
     return true;
   } else {
     if (isBulk && (text.includes("Điểm") || text.includes("Kết quả"))) {
-       console.log("Tính Điểm IT: Extraction failure on text. Sample:", text.substring(0, 150));
+       console.log("Tính Điểm IT: Trích xuất văn bản thất bại. Mẫu:", text.substring(0, 150));
     }
   }
   
@@ -541,18 +540,18 @@ async function saveToStorage(newData, silent = false) {
     let updateCount = 0;
 
     newData.forEach(item => {
-      // Find subject by name (case-insensitive)
+      // Tìm môn học theo tên (không phân biệt hoa thường)
       const existing = existingSubjects.find(s => s.name.toLowerCase().trim() === item.name.toLowerCase().trim());
       const attemptNum = parseInt(item.attempt) || 1;
       const gradeIndex = Math.min(Math.max(attemptNum - 1, 0), 2);
       
       if (existing) {
-        // Multi-attempt cleanup: If we find a real score for Lần 2+ but previously it was "Vắng", clean the board.
+        // Dọn dẹp dữ liệu khi thi nhiều lần: Nếu tìm thấy điểm số thực cho Lần 2+ nhưng trước đó là "Vắng", xóa bảng.
         const isNumeric = typeof item.score === 'number';
         const hadAbsent = existing.grades.some(g => g === "Vắng");
 
         if (attemptNum > 1 && isNumeric && hadAbsent) {
-          console.log(`Tính Điểm IT: Detected numeric score for ${item.name} after 'Vắng'. Resetting board.`);
+          console.log(`Tính Điểm IT: Phát hiện điểm số cho ${item.name} sau khi 'Vắng'. Đang đặt lại bảng điểm.`);
           existing.grades = [null, null, null];
           updated = true;
         }
@@ -589,14 +588,14 @@ async function saveToStorage(newData, silent = false) {
   });
 }
 
-// Observe Gmail for navigation changes (it is a Single Page App)
+// Theo dõi Gmail để biết các thay đổi điều hướng (đây là Ứng dụng Trang Đơn - SPA)
 let lastUrl = location.href;
 const observer = new MutationObserver(() => {
   if (location.href !== lastUrl) {
     lastUrl = location.href;
     setTimeout(scrapeExamData, 1500);
   } else {
-    // Throttled check for content changes
+    // Kiểm tra giới hạn (throttled) cho các thay đổi nội dung
     if (!window._td_it_throttle) {
       window._td_it_throttle = true;
       scrapeExamData();
@@ -607,5 +606,5 @@ const observer = new MutationObserver(() => {
 
 observer.observe(document.body, { childList: true, subtree: true });
 
-// Initial Trigger
+// Kích hoạt ban đầu
 window.addEventListener('load', () => setTimeout(scrapeExamData, 2000));
