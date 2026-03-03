@@ -547,6 +547,16 @@ async function saveToStorage(newData, silent = false) {
       const gradeIndex = Math.min(Math.max(attemptNum - 1, 0), 2);
       
       if (existing) {
+        // Multi-attempt cleanup: If we find a real score for Lần 2+ but previously it was "Vắng", clean the board.
+        const isNumeric = typeof item.score === 'number';
+        const hadAbsent = existing.grades.some(g => g === "Vắng");
+
+        if (attemptNum > 1 && isNumeric && hadAbsent) {
+          console.log(`Tính Điểm IT: Detected numeric score for ${item.name} after 'Vắng'. Resetting board.`);
+          existing.grades = [null, null, null];
+          updated = true;
+        }
+
         if (existing.grades[gradeIndex] === null || existing.grades[gradeIndex] !== item.score) {
           existing.grades[gradeIndex] = item.score;
           existing.autoSynced = true;
