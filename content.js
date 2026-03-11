@@ -83,12 +83,17 @@ function processExamTable(table) {
     const scoreStr = entry["điểm thi"] || entry["điểm kết thúc"] || entry["điểm"] || entry["kết quả"];
     
     if (rawName && scoreStr) {
-      const score = parseFloat(scoreStr.replace(',', '.'));
+      const scoreValue = scoreStr.replace(',', '.');
+      let score;
+      if (/vắng\s*thi/i.test(scoreStr)) score = "Vắng";
+      else if (/cấm\s*thi/i.test(scoreStr)) score = "Cấm";
+      else score = parseFloat(scoreValue);
+
       const attemptRegex = /(\d+)/;
       const attemptMatch = attemptStr.match(attemptRegex);
       const attempt = attemptMatch ? parseInt(attemptMatch[1]) : 1;
 
-      if (!isNaN(score)) {
+      if (score === "Vắng" || score === "Cấm" || !isNaN(score)) {
         const finalName = type ? `${rawName} (${type})` : rawName;
         dataFound.push({
           name: finalName,
@@ -418,7 +423,7 @@ function scrapeFromText(element, isBulk = false) {
         }
 
         const finalName = type ? `${subjectName} (${type})` : subjectName;
-        const attemptKey = Object.keys(tableData).find(k => /Lần/i.test(k));
+        const attemptKey = Object.keys(tableData).find(k => /Lần/i.test(k) && !/vắng/i.test(k));
         let attempt = 1;
         if (attemptKey) {
            const attemptMatch = tableData[attemptKey].match(/(\d+)/);
@@ -426,7 +431,7 @@ function scrapeFromText(element, isBulk = false) {
         }
         
         const statusText = isAbsent ? "Vắng" : "Cấm";
-        console.log(`Tính Điểm IT: Khớp bảng (${statusText})! ${finalName}`);
+        console.log(`Tính Điểm IT: Khớp bảng (${statusText})! ${finalName}, Lần: ${attempt}`);
         saveToStorage([{ name: finalName, score: statusText, attempt: attempt }], isBulk);
         return true;
       }
@@ -454,14 +459,14 @@ function scrapeFromText(element, isBulk = false) {
         }
         
         const finalName = type ? `${subjectName} (${type})` : subjectName;
-        const attemptKey = Object.keys(tableData).find(k => /Lần/i.test(k));
+        const attemptKey = Object.keys(tableData).find(k => /Lần/i.test(k) && !/vắng/i.test(k));
         let attempt = 1;
         if (attemptKey) {
            const attemptMatch = tableData[attemptKey].match(/(\d+)/);
            attempt = attemptMatch ? parseInt(attemptMatch[1]) : 1;
         }
 
-        console.log(`Tính Điểm IT: Khớp bảng! ${finalName}: ${score}`);
+        console.log(`Tính Điểm IT: Khớp bảng! ${finalName}: ${score}, Lần: ${attempt}`);
         saveToStorage([{ name: finalName, score: score, attempt: attempt }], isBulk);
         return true;
       }
